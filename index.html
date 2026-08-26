@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atribución de la Desertificación en Coquimbo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -368,6 +373,16 @@
   footer p.note{font-size:13px; color:var(--ink-mute); margin-top:8px; max-width:480px; line-height:1.6;}
   .backtop{font-size:12.5px; color:var(--ink-mute); text-decoration:none; border-bottom:1px dotted var(--ink-mute);}
 
+  .footer-author{
+    margin-top:32px; padding-top:22px; border-top:1px solid var(--border);
+    display:flex; flex-wrap:wrap; align-items:baseline; column-gap:10px; row-gap:4px;
+    font-size:12.5px; color:var(--ink-mute); line-height:1.7;
+  }
+  .footer-author .fa-name{font-family:"Archivo"; font-weight:700; color:var(--ink); font-size:13px;}
+  .footer-author .sep{color:var(--border-strong);}
+  .footer-author a{color:var(--clay-ink); text-decoration:none; border-bottom:1px dotted currentColor;}
+  .footer-author a:hover{color:var(--ink);}
+
   .stepnum{
     font-family:"Archivo"; font-weight:800; font-size:13px; color:var(--surface); background:var(--clay);
     width:22px; height:22px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;
@@ -376,11 +391,21 @@
   .miniflow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; color:var(--ink-2);}
   .miniflow .arrow{color:var(--ink-mute);}
 
+  .reveal-item{
+    opacity:0; transform:translateY(26px);
+    transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+    will-change:opacity, transform;
+  }
+  .reveal-item.is-visible{opacity:1; transform:translateY(0);}
+
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     *{transition:none !important;}
+    .reveal-item{opacity:1 !important; transform:none !important;}
   }
 </style>
+</head>
+<body>
 
 <div id="tooltip"></div>
 
@@ -887,6 +912,16 @@
           <li><a href="#conclusion">Conclusión</a></li>
         </ul>
       </div>
+    </div>
+
+    <div class="footer-author">
+      <span class="fa-name">Mario Véliz Jorquera</span>
+      <span class="sep">·</span>
+      <span>Ingeniero Comercial, MBA, Diplomado en Evidencia Territorial</span>
+      <span class="sep">·</span>
+      <a href="mailto:mario.veliz.jorquera@gmail.com">mario.veliz.jorquera@gmail.com</a>
+      <span class="sep">·</span>
+      <span>LinkedIn: <a href="https://www.linkedin.com/in/mlveliz/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BiacOO1cxQ72qoHEqySx%2BPg%3D%3D" target="_blank" rel="noopener">linkedin.com/in/mlveliz</a></span>
     </div>
   </div>
 </footer>
@@ -1798,5 +1833,48 @@
   themeBtn.addEventListener('click', function(){ setTimeout(function(){ renderAll(); if(window.__restyleExplorerMap) window.__restyleExplorerMap(); }, 30); });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ setTimeout(function(){ renderAll(); if(window.__restyleExplorerMap) window.__restyleExplorerMap(); }, 30); });
 
+  /* ---------------- SCROLL REVEAL: fade + slide-up on enter, staggered cascade per section ---------------- */
+  (function(){
+    var STAGGER_SELECTORS = [
+      {scope: '.hero > .wrap', step: 90},
+      {scope: '.kpi-row', step: 60},
+      {scope: '.pipeline', step: 100},
+      {scope: '.varmap-grid', step: 70},
+      {scope: '.grid-2', step: 90},
+      {scope: '.two-col', step: 90},
+      {scope: 'footer .cols', step: 90},
+      {scope: 'footer > .wrap', step: 90},
+      {scope: 'section > .wrap', step: 90}
+    ];
+    var seen = new Set();
+    var targets = [];
+    STAGGER_SELECTORS.forEach(function(cfg){
+      document.querySelectorAll(cfg.scope).forEach(function(scopeEl){
+        Array.prototype.forEach.call(scopeEl.children, function(child, i){
+          if(seen.has(child)) return;
+          child.classList.add('reveal-item');
+          child.style.transitionDelay = (i*cfg.step) + 'ms';
+          seen.add(child);
+          targets.push(child);
+        });
+      });
+    });
+    if(!('IntersectionObserver' in window) || targets.length===0){
+      targets.forEach(function(t){ t.classList.add('is-visible'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.08, rootMargin:'0px 0px -6% 0px'});
+    targets.forEach(function(t){ io.observe(t); });
+  })();
+
 })();
 </script>
+</body>
+</html>
