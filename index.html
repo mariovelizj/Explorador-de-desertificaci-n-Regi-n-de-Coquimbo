@@ -1119,17 +1119,15 @@
      SPATIAL EXPLORER — Leaflet map colored by group or by variable
   ================================================================ */
   (function(){
-    /* Esri Gray Canvas basemaps — no API key required (CARTO's free basemaps.cartocdn.com
-       tiles now require a key and render an "API KEY REQUIRED" watermark). Each theme
-       stacks a base layer (fills/terrain) with a reference layer (labels/borders). */
-    var TILE_LIGHT_BASE = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-    var TILE_LIGHT_REF  = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
-    var TILE_DARK_BASE  = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-    var TILE_DARK_REF   = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
-    var TILE_ATTR = '&copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, DeLorme, NAVTEQ';
+    /* CARTO Positron/Dark Matter raster basemaps, using Mario's free CARTO Basemaps API key
+       (carto.com/basemaps/apikey — 5M tile requests/month, non-commercial/academic use). */
+    var CARTO_KEY = 'cb1_26wj_1_74c089d5c3a06880163d59eb';
+    var TILE_LIGHT = 'https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=' + CARTO_KEY;
+    var TILE_DARK  = 'https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=' + CARTO_KEY;
+    var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
     var SEQ_STOPS = ['#cde2fb','#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#184f95','#0d366b'];
 
-    var map=null, tileLayer=null, tileLayerRef=null, pointsLayer=null, canvasRenderer=null, mapInited=false, markers=[];
+    var map=null, tileLayer=null, pointsLayer=null, canvasRenderer=null, mapInited=false, markers=[];
 
     function isDarkMode(){
       var st = root.getAttribute('data-theme');
@@ -1218,8 +1216,7 @@
       }
       try{
         map = L.map('leafletMap', {preferCanvas:true, scrollWheelZoom:true, attributionControl:true});
-        tileLayer = L.tileLayer(isDarkMode()?TILE_DARK_BASE:TILE_LIGHT_BASE, {maxZoom:16, attribution:TILE_ATTR}).addTo(map);
-        tileLayerRef = L.tileLayer(isDarkMode()?TILE_DARK_REF:TILE_LIGHT_REF, {maxZoom:16}).addTo(map);
+        tileLayer = L.tileLayer(isDarkMode()?TILE_DARK:TILE_LIGHT, {maxZoom:20, attribution:TILE_ATTR}).addTo(map);
         map.fitBounds(computeBounds(), {padding:[16,16]});
         canvasRenderer = L.canvas({padding:0.5});
         pointsLayer = L.layerGroup().addTo(map);
@@ -1272,9 +1269,7 @@
     function restyleMapForTheme(){
       if(!mapInited || !map) return;
       map.removeLayer(tileLayer);
-      map.removeLayer(tileLayerRef);
-      tileLayer = L.tileLayer(isDarkMode()?TILE_DARK_BASE:TILE_LIGHT_BASE, {maxZoom:16, attribution:TILE_ATTR}).addTo(map);
-      tileLayerRef = L.tileLayer(isDarkMode()?TILE_DARK_REF:TILE_LIGHT_REF, {maxZoom:16}).addTo(map);
+      tileLayer = L.tileLayer(isDarkMode()?TILE_DARK:TILE_LIGHT, {maxZoom:20, attribution:TILE_ATTR}).addTo(map);
       renderMapPoints();
     }
 
